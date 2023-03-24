@@ -1,0 +1,2 @@
+.olympic-history filter=lfs diff=lfs merge=lfs -text
+*[[:space:]]olympic-history filter=lfs diff=lfs merge=lfs -text
