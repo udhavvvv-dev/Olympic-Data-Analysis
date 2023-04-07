@@ -251,5 +251,15 @@ The Streamlit library is used to create an interactive web application for users
 The visualizations are organized into different sections, such as medal tally, overall analysis, country analysis, and athlete analysis, which can be accessed by the user through the web application interface.
 Overall, the data preprocessing and data visualization aspects of your project are closely integrated, with the preprocessed data being used to generate various types of visualizations that are presented to the user through an interactive web application.
 
-
-
+### Blogs to know about core concept of project 
+  - https://www.ibm.com/in-en/topics/data-visualization#:~:text=Data%20visualization%20is%20the%20representation,that%20is%20easy%20to%20understand.
+  - https://www.tableau.com/learn/articles/data-visualization
+  - https://powerbi.microsoft.com/en-us/data-visualization/
+  - https://www.javatpoint.com/what-is-data-visualization
+  - https://visme.co/blog/best-data-visualizations/
+  - https://www.techtarget.com/searchdatamanagement/definition/data-analytics#:~:text=Data%20analytics%20(DA)%20is%20the,of%20specialized%20systems%20and%20software.
+  - https://www.investopedia.com/terms/d/data-analytics.asp
+  - https://www.simplilearn.com/tutorials/data-analytics-tutorial/what-is-data-analytics
+  - https://www.tibco.com/reference-center/what-is-data-analytics
+  - https://en.wikipedia.org/wiki/Data_analysis#:~:text=Data%20analysis%2C%20is%20a%20process,test%20hypotheses%2C%20or%20disprove%20theories.
+  
