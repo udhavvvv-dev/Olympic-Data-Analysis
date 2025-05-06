@@ -5,6 +5,8 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.figure_factory as ff
+import plotly.graph_objects as go
+
 
 
 df = pd.read_csv('./olympic-history/athlete_events.csv')
@@ -113,31 +115,63 @@ if user_menu == 'Country Analysis':
     st.title(f"{selected_country } Medals Over the Years")
     st.plotly_chart(fig)
 
-    st.title(f"{selected_country } in various sports")
+# Assuming you're using Streamlit to get user input for country selection
+selected_country = st.selectbox("Select Country", df['region'].unique())
+
+# Now use this variable in the following code:
+
+try:
     pt = helper.country_event_heatmap(df, selected_country)
-    fig, ax = plt.subplots(figsize=(20,20))
-    ax = sns.heatmap(pt, annot=True )
-    st.pyplot(fig)
+    if pt.empty:
+        st.write("No data available to plot heatmap for this country.")
+    else:
+        fig, ax = plt.subplots(figsize=(20,20))
+        ax = sns.heatmap(pt, annot=True)
+        st.pyplot(fig)
 
-    st.title(f"Best athletes of {selected_country}")
-    athlete_df = helper.country_athlete_analysis(df, selected_country)
-    st.table(athlete_df)
+except Exception as e:
+    st.write("Could not generate heatmap:", e)
 
+# And for the next part:
 
-if user_menu ==  'Athlete Analysis':
-    athlete_df = df.drop_duplicates(subset=['Name','region'])
+st.title(f"Best athletes of {selected_country}")
+athlete_df = helper.country_athlete_analysis(df, selected_country)
+st.table(athlete_df)
 
+if user_menu == 'Athlete Analysis':
+    athlete_df = df.drop_duplicates(subset=['Name', 'region'])
+
+    # Creating the distribution plots using Plotly Express
     x1 = athlete_df['Age'].dropna()
     x2 = athlete_df[athlete_df['Medal'] == 'Gold']['Age'].dropna()
     x3 = athlete_df[athlete_df['Medal'] == 'Silver']['Age'].dropna()
     x4 = athlete_df[athlete_df['Medal'] == 'Bronze']['Age'].dropna()
 
-    fig = ff.create_distplot([x1, x2, x3, x4], ['Overall Age', 'Gold Medalist','Silver Medalist', ' Bronze Medalist'], show_hist=False, show_rug=False)
-    fig.update_layout(autosize=False, width=1000, height=600)
-    st.title("Athletes - Distribution by Age")
+    # Create a DataFrame to handle the data properly for Plotly
+    age_data = pd.DataFrame({
+        'Overall Age': x1,
+        'Gold Medalist': x2,
+        'Silver Medalist': x3,
+        'Bronze Medalist': x4
+    })
 
+    # Convert the DataFrame into long format for Plotly
+    age_data_long = age_data.melt(var_name='Medal', value_name='Age')
+
+    # Plotting the histogram
+    fig = px.histogram(
+        age_data_long,
+        x='Age',
+        color='Medal',
+        labels={'Age': 'Age', 'Medal': 'Medal'},
+        title="Athletes - Distribution by Age",
+        marginal="box",
+        histnorm='probability density'
+    )
+    fig.update_layout(autosize=False, width=1000, height=600)
     st.plotly_chart(fig)
 
+    # Sports distribution by Age for Gold Medalists
     x = []
     name = []
     famous_sports = ['Basketball', 'Judo', 'Football', 'Tug-Of-War', 'Athletics',
@@ -154,16 +188,48 @@ if user_menu ==  'Athlete Analysis':
         x.append(temp_df[temp_df['Medal'] == 'Gold']['Age'].dropna())
         name.append(sport)
 
-    fig = ff.create_distplot(x, name, show_hist=False, show_rug=False)
+    # Create a DataFrame for the sports distribution
+    sports_data = pd.DataFrame({ 'Sport': name, 'Age Distribution': x })
+
+    # Flatten the data for Plotly
+    sports_data_long = pd.DataFrame({
+    'Sport': [sport for sport, ages in zip(name, x) for _ in range(len(ages))],
+    'Age': [age for ages in x for age in ages]
+    })
+
+
+    # Plotting the sports distribution by Age for Gold Medalists
+    fig = px.histogram(
+        sports_data_long,
+        x='Age',
+        color='Sport',
+        labels={'Age': 'Age', 'Sport': 'Sport'},
+        title="Sports - Distribution by Age for Gold Medalist",
+        marginal="box",
+        histnorm='probability density'
+    )
     fig.update_layout(autosize=False, width=1000, height=600)
-    st.title("Sports - Distribution by Age for Gold Medalist")
     st.plotly_chart(fig)
 
+# Create the distribution plot for famous sports using Plotly Express
+    fig = px.histogram(
+    sports_data_long,  # Using the long-format DataFrame
+    x='Age',  # X-axis will be Age
+    color='Sport',  # Color by Sport to distinguish the different sports
+    labels={'Age': 'Age', 'Sport': 'Sport'},
+    title="Sports - Distribution by Age for Gold Medalist",
+    marginal="box",  # Show marginal box plot
+    histnorm='probability density'  # Normalize to probability density
+    )
+    fig.update_layout(autosize=False, width=1000, height=600)
 
+# Pass a unique key argument
+    st.plotly_chart(fig, key="unique_key_sports_distribution")
+
+
+    # Men vs Women Participation Over the Years
     st.title("Men Vs Women Participation Over the Years")
     final = helper.men_vs_women(df)
     fig = px.line(final, x="Year", y=["Male", "Female"])
     fig.update_layout(autosize=False, width=1000, height=600)
-    st.plotly_chart(fig)
-
-    
+    st.plotly_chart(fig)    
